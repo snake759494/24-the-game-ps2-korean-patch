@@ -1,0 +1,11 @@
+{
+ "version": "v1.0",
+ "asset": "24TheGame_KO_v1.0.xdelta",
+ "asset_size": 433667,
+ "asset_sha256": "f48de74f4b4829651c0b555fd512bd34b98f10d400c1ed010325220314b965f5",
+ "source_iso_size": 4562092032,
+ "source_iso_md5": "f60b2cdb21a40d06c2febdf2381b7891",
+ "source_iso_sha256": "49ddf50e6f8633ec6cdd31576bbd308c384f0880c87138ad20f96bd728f8b4c0",
+ "result_iso_size": 4564217856,
+ "result_iso_sha256": "cccf9baec54cd0f4c343bcc3011d922fb63ba083b1fa1f9b4f05108d89f20744"
+}
