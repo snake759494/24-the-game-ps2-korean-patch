@@ -34,6 +34,11 @@ def glyph(fid, ch):
     a = np.asarray(im.resize((32, 32), Image.BOX), np.float32) / 255.0
     a = np.clip(a * 1.35, 0, 1) ** 0.8          # 획 농도 강화(가독성)
     p = np.clip(np.round(a * 15), 0, 15).astype(np.uint8)
+    if os.environ.get('FONTMARK') and fid in (1, 2, 3, 4):  # 진단용: 폰트별 표시
+        if fid == 1: p[1, 0:20] = p[22, 0:20] = 15; p[1:23, 0] = p[1:23, 19] = 15
+        if fid == 2: p[23:25, 0:20] = 15
+        if fid == 3: p[0:2, 0:20] = 15
+        if fid == 4: p[0:24, 0:2] = 15
     xs = np.nonzero(p.any(0))[0]
     adv = (int(xs.max()) + 2) if len(xs) else size // 2
     if fid in ADVREF:
