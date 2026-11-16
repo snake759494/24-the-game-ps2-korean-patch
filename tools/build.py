@@ -173,7 +173,8 @@ def main():
     small = sorted(small)
     # fid1(메뉴 버튼·튜토리얼 패널): 작은 세트 + 버튼/글머리 코드가 든 문구(튜토리얼·조작 안내)의 글자
     import re as _re
-    tut = set(small)
+    caps = {c for c in caps_chars(tr) if ord(c) > 0x7e}
+    tut = set(caps)  # 메뉴 버튼(영어 대문자) + 조작 안내 문구
     for e, k in tr.items():
         if _re.search(r'@[xz][A-Z_]{4}', e):
             tut.update(c for c in k if ord(c) > 0x7e)
@@ -181,11 +182,17 @@ def main():
     log.append('tutorial set %d' % len(tut))
     log.append('small set %d' % len(small))
     full = hangul + other
+    title = set(caps)  # fid2(제목·장소명): 대문자 원문 + 아주 짧은 문구
+    for k in tr.values():
+        if len(k) <= 4:
+            title.update(c for c in k if ord(c) > 0x7e)
+    title = sorted(title)
+    log.append('title set %d' % len(title))
     mini = sorted({c for c in caps_chars(tr, 6) if ord(c) > 0x7e})
-    plan = os.environ.get('FONTPLAN', '0f,1t,2s,3n,4n')
+    plan = os.environ.get('FONTPLAN', '0f,1t,2c,3n,4n')
     sets = {}
     for t in plan.split(','):
-        sets[int(t[:-1])] = {'f': full, 's': small, 't': tut, 'm': mini, 'n': []}[t[-1]]
+        sets[int(t[:-1])] = {'f': full, 's': small, 't': tut, 'm': mini, 'c': title, 'n': []}[t[-1]]
     sets['small'] = small
     sets['used'] = used
     build_fonts(D, sets, log)

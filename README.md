@@ -4,8 +4,8 @@ PS2 북미판 **24: The Game (SLUS-21268)** 비공식 한국어 패치입니다.
 
 ## 적용 방법
 1. 아래 해시와 일치하는 **원본 `.iso`** (Redump 형식)를 준비합니다. CSO·CHD 등으로 변환한 이미지에는 적용할 수 없습니다.
-2. xdeltaUI 같은 도구로 원본 ISO에 `24TheGame_KO_v1.1.xdelta`를 적용합니다.
-   - 명령줄: `xdelta3 -d -s "24 - The Game (USA) (En,Fr,Es).iso" 24TheGame_KO_v1.1.xdelta "24 - The Game (USA) (Korean).iso"`
+2. xdeltaUI 같은 도구로 원본 ISO에 `24TheGame_KO_v1.2.xdelta`를 적용합니다.
+   - 명령줄: `xdelta3 -d -s "24 - The Game (USA) (En,Fr,Es).iso" 24TheGame_KO_v1.2.xdelta "24 - The Game (USA) (Korean).iso"`
 3. 만들어진 ISO를 PCSX2 등에서 실행합니다.
 
 | 항목 | 값 |
