@@ -99,6 +99,8 @@ def build_fonts(D, charsets, log):
         chars = charsets.get(fid, charsets['small'])
         # 메모리 확보: 번역문에 쓰이지 않는 확장 문자(프랑스어·스페인어 악센트 등) 글리프 제거
         keep = [k for k, r in enumerate(recs) if r[0] <= 0x7e or chr(r[0]) in charsets['used']]
+        if chars is None:  # 글리프를 fid0 과 공유(ELF 패치): 파일에는 글리프를 두지 않음
+            keep, chars = [], []
         recs = [recs[k] for k in keep]
         imgs = [imgs[k] for k in keep]
         have = {r[0] for r in recs}
@@ -114,6 +116,55 @@ def build_fonts(D, charsets, log):
         data = b'FBM1' + struct.pack('<I', len(data)) + data
         ns = D.replace(FONT_GROUP, i, data)
         log.append('font E%d fid%d +%d glyphs -> sector %d (%d bytes)' % (i, fid, len(add), ns, len(data)))
+
+
+# 폰트 슬롯 생성 루프(0x4473d0)에서 새 슬롯 {높이, 글리프셋} 을 채우는 자리를
+# 코드 동굴(0x4722c8, 함수 사이 nop 패딩)로 돌려, 슬롯 1·2(fid1·fid2)는 슬롯 0 의 글리프셋을 쓰게 함.
+# → fid1·fid2 에 한글 글리프를 따로 둘 필요가 없어 레벨 메모리 약 1.3MB 확보.
+ELF_NAME = 'SLUS_212.68'
+SHARE_HOOK = 0x4475ac
+SHARE_CAVE = 0x4722c8
+FREE_HOOK = 0x447328
+
+
+def _j(target):
+    return 0x08000000 | ((target >> 2) & 0x3ffffff)
+
+
+def share_glyphs(D, log):
+    sec, size = D.recs[ELF_NAME][:2]
+    off = lambda va: sec * SEC + va - 0x100000 + 0x80
+    hook_orig = [0x6ba30007, 0x6fa30000, 0xb0430007, 0xb4430000]
+    hook = [_j(SHARE_CAVE), 0x00000000, 0x00000000, 0x00000000]
+    cave = [
+        0x8e880010,  # lw   t0, 0x10(s4)   슬롯 수(새 슬롯 번호+1)
+        0x2508fffe,  # addiu t0, t0, -2
+        0x2d080002,  # sltiu t0, t0, 2      새 슬롯이 1 또는 2 이면 1
+        0x8e890018,  # lw   t1, 0x18(s4)   슬롯 배열
+        0x8d290004,  # lw   t1, 4(t1)      슬롯 0 의 글리프셋
+        0x0268480a,  # movz t1, s3, t0     아니면 새로 만든 글리프셋
+        0xac400000,  # sw   zero, 0(v0)
+        _j(SHARE_HOOK + 0x10),
+        0xac490004,  # sw   t1, 4(v0)       (지연 슬롯)
+        # 폰트 전체 해제(0x447258)에서 슬롯 1·2 는 공유 글리프셋이므로 지우지 않음
+        0x8c640004,  # lw   a0, 4(v1)
+        0x2648ffff,  # addiu t0, s2, -1     s2 = 슬롯 번호
+        0x2d080002,  # sltiu t0, t0, 2
+        _j(FREE_HOOK + 8),
+        0x0008200b,  # movn a0, zero, t0    (지연 슬롯) 슬롯 1·2 면 a0=0 → 삭제 건너뜀
+    ]
+    free_orig = [0x00621821, 0x8c640004]
+    free_hook = [_j(SHARE_CAVE + 9 * 4), 0x00621821]
+    f = D.f
+    f.seek(off(SHARE_HOOK)); cur = list(struct.unpack('<4I', f.read(16)))
+    assert cur == hook_orig, [hex(x) for x in cur]
+    f.seek(off(SHARE_CAVE)); assert f.read(len(cave) * 4) == bytes(len(cave) * 4)
+    f.seek(off(FREE_HOOK)); cur = list(struct.unpack('<2I', f.read(8)))
+    assert cur == free_orig, [hex(x) for x in cur]
+    f.seek(off(SHARE_HOOK)); f.write(struct.pack('<4I', *hook))
+    f.seek(off(FREE_HOOK)); f.write(struct.pack('<2I', *free_hook))
+    f.seek(off(SHARE_CAVE)); f.write(struct.pack('<%dI' % len(cave), *cave))
+    log.append('glyph share patch: hook %x -> cave %x' % (SHARE_HOOK, SHARE_CAVE))
 
 
 def main():
@@ -189,13 +240,15 @@ def main():
     title = sorted(title)
     log.append('title set %d' % len(title))
     mini = sorted({c for c in caps_chars(tr, 6) if ord(c) > 0x7e})
-    plan = os.environ.get('FONTPLAN', '0f,1t,2c,3n,4n')
+    plan = os.environ.get('FONTPLAN', '0f,1z,2z,3n,4n')
     sets = {}
     for t in plan.split(','):
-        sets[int(t[:-1])] = {'f': full, 's': small, 't': tut, 'm': mini, 'c': title, 'n': []}[t[-1]]
+        sets[int(t[:-1])] = {'f': full, 's': small, 't': tut, 'm': mini, 'c': title, 'n': [], 'z': None}[t[-1]]
     sets['small'] = small
     sets['used'] = used
     build_fonts(D, sets, log)
+    if os.environ.get('FONTSHARE', '1') == '1':
+        share_glyphs(D, log)
     D.close()
     log.append('done %.1fs -> %s' % (time.time() - t0, out))
     print('\n'.join(log))

@@ -4,8 +4,8 @@ PS2 북미판 **24: The Game (SLUS-21268)** 비공식 한국어 패치입니다.
 
 ## 적용 방법
 1. 아래 해시와 일치하는 **원본 `.iso`** (Redump 형식)를 준비합니다. CSO·CHD 등으로 변환한 이미지에는 적용할 수 없습니다.
-2. xdeltaUI 같은 도구로 원본 ISO에 `24TheGame_KO_v1.2.xdelta`를 적용합니다.
-   - 명령줄: `xdelta3 -d -s "24 - The Game (USA) (En,Fr,Es).iso" 24TheGame_KO_v1.2.xdelta "24 - The Game (USA) (Korean).iso"`
+2. xdeltaUI 같은 도구로 원본 ISO에 `24TheGame_KO_v1.3.xdelta`를 적용합니다.
+   - 명령줄: `xdelta3 -d -s "24 - The Game (USA) (En,Fr,Es).iso" 24TheGame_KO_v1.3.xdelta "24 - The Game (USA) (Korean).iso"`
 3. 만들어진 ISO를 PCSX2 등에서 실행합니다.
 
 | 항목 | 값 |
@@ -16,7 +16,7 @@ PS2 북미판 **24: The Game (SLUS-21268)** 비공식 한국어 패치입니다.
 | xdelta SHA-256 | `de670ce83307279d08a86a40cfffebef5c14f8146b4577bd0c4d0c32de8f3c21` |
 | 결과 ISO 크기 | 4,563,658,752 바이트 |
 | 결과 ISO SHA-256 | `65f692150a0cbc20f19e21acbae1bcc515e9c3a0ef2db5f3ca0f310ece63f931` |
-| 게임 CRC (PCSX2) | `F1C7201E` (실행 파일은 원본 그대로) |
+| 게임 CRC (PCSX2) | `7DC649BC` (v1.3부터 실행 파일 수정, 원본은 `F1C7201E`) |
 
 ## 주의
 - 원본에서 만든 상태저장은 불러오지 마세요. 메모리 카드 세이브는 그대로 쓸 수 있습니다.

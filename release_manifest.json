@@ -1,11 +1,11 @@
 {
- "version": "v1.2",
- "asset": "24TheGame_KO_v1.2.xdelta",
- "asset_size": 346387,
- "asset_sha256": "91b3156ec712e17659b2dd2f7ce945bd2da109025c071bc5d170d6179facf385",
+ "version": "v1.3",
+ "asset": "24TheGame_KO_v1.3.xdelta",
+ "asset_size": 247557,
+ "asset_sha256": "3bb6cd2ac3b52d6a65704b78f5c827b2788ab461c3827bad55e944fb4c29d64c",
  "source_iso_size": 4562092032,
  "source_iso_md5": "f60b2cdb21a40d06c2febdf2381b7891",
  "source_iso_sha256": "49ddf50e6f8633ec6cdd31576bbd308c384f0880c87138ad20f96bd728f8b4c0",
- "result_iso_size": 4563560448,
- "result_iso_sha256": "ad9d25a63493e4a6310637efd823991176a49c6dd1606f971878b0658f4dbff3"
+ "result_iso_size": 4562726912,
+ "result_iso_sha256": "bc81cbdd6ecb50aca834229547a5daf90a67df9f0dcfea7b6873e7dbf1f00825"
 }
